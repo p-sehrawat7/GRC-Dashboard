@@ -8,6 +8,7 @@ Defaults to a local SQLite file: backend/grc.db
 """
 
 import os
+import sys
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from contextlib import contextmanager
@@ -31,8 +32,34 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
 def init_db() -> None:
-    """Create all tables if they do not already exist."""
+    """
+    Create all tables if they do not already exist, then auto-seed
+    default users and GRC data if the database is empty.
+
+    This ensures Streamlit Cloud deployments work on first boot
+    without requiring grc.db to be committed to the repository.
+    """
     Base.metadata.create_all(bind=engine)
+    _auto_seed_if_empty()
+
+
+def _auto_seed_if_empty() -> None:
+    """Seed the database with default data if no users exist yet."""
+    db = SessionLocal()
+    try:
+        from database.models import User  # noqa: PLC0415
+        if db.query(User).count() == 0:
+            # Add the project root to sys.path so database.seed is importable
+            _project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            if _project_root not in sys.path:
+                sys.path.insert(0, _project_root)
+            from database.seed import seed  # noqa: PLC0415
+            seed()
+    except Exception as exc:  # noqa: BLE001
+        # Seeding failure is non-fatal — app boots, login will show an error
+        print(f"[auto-seed] warning: {exc}")
+    finally:
+        db.close()
 
 
 @contextmanager
