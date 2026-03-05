@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  grc-dashboard:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./backend:/app/backend     # persist SQLite DB between restarts
+      - ./logs:/app/logs           # persist application logs
+    environment:
+      - DATABASE_URL=sqlite:///backend/grc.db
+    restart: unless-stopped

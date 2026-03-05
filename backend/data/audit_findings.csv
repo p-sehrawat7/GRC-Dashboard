@@ -1,0 +1,16 @@
+finding_id,risk_id,control_id,title,severity,status,due_date,owner,last_updated,description
+F-01,R-01,C-01,MFA Not Enforced on Admin Accounts,Critical,Open,2026-01-15,IT Security Team,2026-02-01,Multi-factor authentication has not been enabled on 8 of 12 privileged admin accounts. Exploitation could lead to full domain compromise.
+F-02,R-05,C-08,No EDR Solution Deployed,Critical,Open,2026-01-30,IT Operations,2026-02-10,Endpoint Detection and Response solution not deployed. Ransomware or APT activity would go undetected on endpoints.
+F-03,R-06,C-09,Vendor Risk Assessments Not Performed,Critical,Open,2026-02-28,Procurement,2026-02-15,Third-party vendors granted network access without security questionnaire or contractual security requirements.
+F-04,R-15,C-05,No SIEM or Centralized Log Monitoring,Critical,In Remediation,2026-03-15,SOC Team,2026-02-18,No centralized SIEM. Security events from firewalls and servers not correlated. Detection capability is severely limited.
+F-05,R-09,C-12,Legacy Systems Unpatched Beyond 90 Days,High,Open,2026-01-20,IT Operations,2026-01-25,17 legacy servers running Windows Server 2012 with no patches applied in over 90 days. Exploitable via known CVEs.
+F-06,R-03,C-06,Security Awareness Training Not Conducted,High,Open,2026-02-15,HR & Security,2026-02-05,Annual security awareness training not completed. Only 23% of employees have completed mandatory training this cycle.
+F-07,R-08,C-11,No DLP Controls for Data Exfiltration,High,Open,2026-03-01,Data Governance,2026-02-12,USB ports unrestricted and no DLP email monitoring. High risk of insider data theft remains unmitigated.
+F-08,R-10,C-13,Password Policy Not Technically Enforced,High,In Remediation,2026-02-20,IT Security Team,2026-02-16,Password complexity rules exist in policy document but Group Policy not configured to enforce them technically.
+F-09,R-02,C-03,Incident Response Tabletop Exercise Overdue,Medium,Closed,2025-12-31,CISO Office,2026-01-05,Annual IR tabletop exercise not conducted. IR plan exists but untested. Now closed after Q4 exercise completion.
+F-10,R-04,C-04,Security Policy Not Formally Approved,Medium,Open,2026-03-31,Compliance,2026-02-10,Draft security policy exists but not approved by Board or Executive team. Non-compliant with ISO 27001 A.5.1.
+F-11,R-12,C-15,BCP Not Tested or Approved,Medium,Open,2026-04-15,Business Continuity,2026-02-01,Business Continuity Plan in draft form. No formal DR test conducted. RTO and RPO targets unvalidated.
+F-12,R-07,C-10,DDoS Protection Configuration Review Required,Medium,Closed,2025-11-30,Network Team,2025-12-15,DDoS protection rules review completed and updated. Cloudflare WAF configured and validated.
+F-13,R-03,C-02,Access Reviews Not Conducted in 12 Months,High,Open,2026-02-28,IAM Team,2026-02-08,Periodic access reviews for privileged and standard user accounts not performed. Stale accounts accumulating.
+F-14,R-11,C-14,Backup Restoration Test Due,Low,Closed,2025-10-31,IT Operations,2025-11-02,Quarterly backup restoration test completed successfully. AES-256 encryption verified on all backup sets.
+F-15,R-14,C-04,Data Classification Policy Missing,Medium,Open,2026-05-01,Data Governance,2026-02-14,No formal data classification scheme defined. Assets not labelled. Required for GDPR and ISO 27001 compliance.

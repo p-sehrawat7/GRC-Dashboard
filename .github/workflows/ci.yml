@@ -1,0 +1,36 @@
+name: CI — GRC Audit Dashboard
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Black (formatting check)
+        run: black --check dashboard/ tests/ database/
+
+      - name: Run Flake8 (linting)
+        run: flake8 dashboard/ tests/ database/
+
+      - name: Run pytest
+        run: pytest tests/ -v --tb=short --color=yes
+        env:
+          DATABASE_URL: "sqlite:///:memory:"

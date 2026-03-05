@@ -1,0 +1,16 @@
+risk_id,risk_description,asset,threat,vulnerability,impact,likelihood,risk_score,risk_level,treatment_status,iso_clause,nist_function
+R-01,Unauthorized access to customer financial data due to lack of MFA on admin accounts,Customer Financial Data,External Attacker,No MFA on admin access,5,4,20,Critical,In Progress,A.9.4,Protect
+R-02,Delayed incident response due to absence of formal IR plan,Operations,Security Incident,No incident response procedure,4,3,12,High,Mitigated,A.5.25,Respond
+R-03,Data leakage due to excessive employee access permissions,Customer PII,Insider Misuse,No periodic access review,4,3,12,High,In Progress,A.9.1,Protect
+R-04,Regulatory non-compliance due to undocumented security policies,Compliance Data,Audit Failure,Lack of formal policies,3,3,9,Medium,Accepted,A.5.1,Identify
+R-05,Ransomware attack encrypting critical business data via phishing email,Business Data,Ransomware,No email filtering or endpoint protection,5,4,20,Critical,In Progress,A.8.7,Protect
+R-06,Supply chain compromise through unvetted third-party vendor access,Cloud Infrastructure,Supply Chain Attack,No vendor risk assessment process,4,4,16,Critical,In Progress,A.5.22,Identify
+R-07,DDoS attack disrupting customer-facing web applications,Web Application,External Attacker,No DDoS mitigation controls,4,3,12,High,Accepted,A.8.20,Protect
+R-08,Insider threat exfiltrating intellectual property via removable media,IP & Source Code,Malicious Insider,No DLP or USB policy enforcement,5,2,10,High,In Progress,A.8.11,Protect
+R-09,Unpatched vulnerabilities in legacy systems exploited remotely,Legacy Systems,External Attacker,No patch management program,4,4,16,Critical,In Progress,A.8.8,Protect
+R-10,Weak password policy enabling brute-force attacks on employee accounts,Employee Accounts,External Attacker,No password complexity enforcement,3,4,12,High,In Progress,A.9.4,Protect
+R-11,Data breach due to unencrypted backup storage exposed on cloud,Backup Data,External Attacker,Backups stored without encryption,5,3,15,Critical,Mitigated,A.8.13,Protect
+R-12,Lack of business continuity plan causing prolonged downtime post-incident,Business Operations,Any Major Incident,No BCP or DR plan,4,2,8,Medium,Accepted,A.5.29,Recover
+R-13,Unauthorized physical access to server room by non-IT staff,Data Center,Physical Intrusion,No physical access controls,4,2,8,Medium,Mitigated,A.7.1,Protect
+R-14,Loss of sensitive data due to lack of data classification policy,All Data Assets,Accidental Disclosure,No formal data classification framework,3,3,9,Medium,Accepted,A.5.12,Identify
+R-15,Failure to detect malicious activity lacking SIEM or log monitoring,Network Infrastructure,Advanced Persistent Threat,No centralized log management,4,4,16,Critical,In Progress,A.8.15,Detect
