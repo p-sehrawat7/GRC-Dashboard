@@ -360,16 +360,7 @@ The ORM code stays identical — SQLAlchemy handles the driver switch transparen
 
 Streamlit Cloud is the easiest way to get a live public URL for this app, and it's free.
 
-### Before you deploy
-
-For the demo to work on Streamlit Cloud, the seeded `grc.db` file needs to be committed to GitHub (SQLite needs to exist as a file the app can open):
-
-```bash
-# Temporarily un-ignore the db file, commit it, then push
-git add backend/grc.db
-git commit -m "chore: include seeded grc.db for Streamlit Cloud demo"
-git push
-```
+The app is **Streamlit Cloud ready out of the box** — on first boot, `db.py` automatically creates all tables and seeds the full dataset (40 risks, 40 controls, 40 findings, 3 users) via `_auto_seed_if_empty()`. No manual steps or committed database files are needed.
 
 ### Deploy steps
 
@@ -384,7 +375,7 @@ Your app will be live in 2–3 minutes at a URL like:
 
 ### Using PostgreSQL on Streamlit Cloud
 
-If you'd rather not commit the SQLite file, you can point the app at a hosted PostgreSQL instance (e.g. Supabase, Neon, or Railway — all have free tiers). In Streamlit Cloud:
+For persistent data across restarts, point the app at a hosted PostgreSQL instance (e.g. Supabase, Neon, or Railway — all have free tiers). In Streamlit Cloud:
 
 1. Go to **App settings → Secrets**
 2. Add the following:
@@ -414,15 +405,11 @@ If you'd rather not commit the SQLite file, you can point the app at a hosted Po
 
 ---
 
-## Known Limitations (and honest notes)
+## Known Limitations
 
-A few things I deliberately kept simple for this portfolio context:
-
-- **No delete UI for risks/controls** — The backend `delete_risk()` function exists and is tested, but there's no delete button in the UI. In real GRC tools, hard deletion is almost never allowed — records are "retired" instead to preserve the audit trail. I've kept the same philosophy here.
-- **SQLite isn't thread-safe** — For a single-user local demo this is fine. Streamlit Cloud runs single-threaded too. For multi-user production you'd want PostgreSQL.
-- **No rate limiting on login** — The login form has no lockout after repeated failures. Fine for a demo; a production deployment would add this.
-- **No user management UI** — You can't add or change users from the dashboard itself. Users are managed via the seed script or direct database access.
+- **No delete UI for risks/controls** — The backend `delete_risk()` function exists and is tested, but there's no delete button in the UI. In real GRC tools, hard deletion is rarely allowed — records are "retired" instead to preserve the audit trail. This project follows the same philosophy.
+- **SQLite is single-threaded** — Fine for a single-user local or Streamlit Cloud deployment. For multi-user production, switch to PostgreSQL via `DATABASE_URL`.
+- **No login rate limiting** — The login form has no lockout after repeated failures. A production deployment should add this.
+- **No user management UI** — Users are managed via the seed script or direct database access, not from within the dashboard.
 
 ---
-
-*Built as a portfolio project — GRC Simulation 2026*
