@@ -21,7 +21,7 @@ def risk_filters(df: pd.DataFrame) -> pd.DataFrame:
         Filtered DataFrame based on user selections.
     """
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🔍 Risk Filters")
+    st.sidebar.markdown("### Risk Filters")
 
     # Asset filter
     assets = sorted(df["asset"].dropna().unique().tolist())
@@ -67,7 +67,7 @@ def control_filters(df: pd.DataFrame) -> pd.DataFrame:
         Filtered DataFrame based on user selections.
     """
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🔍 Control Filters")
+    st.sidebar.markdown("### Control Filters")
 
     # Control Type filter
     ctypes = sorted(df["control_type"].dropna().unique().tolist())
@@ -107,7 +107,7 @@ def findings_filters(df: pd.DataFrame) -> Tuple[pd.DataFrame, bool]:
         Tuple of (filtered DataFrame, show_overdue_only flag).
     """
     st.sidebar.markdown("---")
-    st.sidebar.markdown("### 🔍 Findings Filters")
+    st.sidebar.markdown("### Findings Filters")
 
     # Severity filter
     severities = ["Critical", "High", "Medium", "Low"]

@@ -82,7 +82,7 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
 
     # ── Click-to-Edit hint ─────────────────────────────────────────────────
     if role in ("admin", "auditor"):
-        st.info("💡 **Click any row** in the table below to open the edit panel for that risk.")
+        st.info("Click any row in the table below to open the edit panel for that risk.")
 
     styled = (
         filtered_df[display_cols].style
@@ -118,7 +118,7 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
                 <div style="background:linear-gradient(135deg,#1E3A5F 0%,#2563EB 100%);
                             padding:14px 20px;border-radius:10px;margin-bottom:16px;">
                   <span style="color:#fff;font-size:18px;font-weight:700;">
-                    ✏️ Editing Risk: {risk_id_sel}
+                    Editing Risk: {risk_id_sel}
                   </span><br>
                   <span style="color:#BAD5FF;font-size:13px;">
                     {selected_row['risk_description'][:120]}{'...' if len(str(selected_row['risk_description'])) > 120 else ''}
@@ -148,7 +148,7 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
                             "Accepted = risk accepted by management  |  "
                             "Transferred = insured or outsourced  |  "
                             "Avoided = activity/asset removed  |  "
-                            "Resolved = risk fully closed and verified ✅"
+                            "Resolved = risk fully closed and verified"
                         ),
                     )
 
@@ -167,12 +167,12 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
 
                 # Show a visual status badge preview
                 badge_colors = {
-                    "Resolved":    ("#1B5E20", "#fff", "✅"),
-                    "Mitigated":   ("#1565C0", "#fff", "🛡️"),
-                    "In Progress": ("#E65100", "#fff", "🔄"),
-                    "Accepted":    ("#546E7A", "#fff", "✓"),
-                    "Transferred": ("#6A1B9A", "#fff", "↗"),
-                    "Avoided":     ("#37474F", "#fff", "⊘"),
+                    "Resolved":    ("#1B5E20", "#fff", "[R]"),
+                    "Mitigated":   ("#1565C0", "#fff", "[M]"),
+                    "In Progress": ("#E65100", "#fff", "[P]"),
+                    "Accepted":    ("#546E7A", "#fff", "[A]"),
+                    "Transferred": ("#6A1B9A", "#fff", "[T]"),
+                    "Avoided":     ("#37474F", "#fff", "[X]"),
                 }
                 bg, fg, icon = badge_colors.get(new_status, ("#546E7A", "#fff", ""))
                 st.markdown(
@@ -186,7 +186,7 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
                 save_col, cancel_col = st.columns([1, 3])
                 with save_col:
                     submitted = st.form_submit_button(
-                        "💾 Save Changes", use_container_width=True, type="primary"
+                        "Save Changes", use_container_width=True, type="primary"
                     )
 
                 if submitted:
@@ -213,7 +213,7 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
                                 if "risk_level" in changes:
                                     parts.append(f"Level → **{new_level}**")
                                 st.success(
-                                    f"✅ Risk **{risk_id_sel}** updated: {' | '.join(parts)}"
+                                    f"Risk **{risk_id_sel}** updated: {' | '.join(parts)}"
                                 )
                                 st.rerun()
                             else:
