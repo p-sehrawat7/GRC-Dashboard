@@ -35,8 +35,10 @@ def risk_filters(df: pd.DataFrame) -> pd.DataFrame:
         "Filter by Risk Level", options=levels, default=levels, key="risk_level_filter"
     )
 
-    # Treatment Status filter
-    statuses = sorted(df["treatment_status"].dropna().unique().tolist())
+    # Treatment Status filter — fixed order so "Resolved" always appears
+    all_statuses = ["Resolved", "Mitigated", "In Progress", "Accepted", "Transferred", "Avoided"]
+    statuses = [s for s in all_statuses if s in df["treatment_status"].dropna().unique()] + \
+               [s for s in df["treatment_status"].dropna().unique() if s not in all_statuses]
     selected_statuses = st.sidebar.multiselect(
         "Filter by Treatment Status", options=statuses, default=statuses, key="risk_treatment"
     )

@@ -30,11 +30,12 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
     filtered_df = risk_filters(risk_df)
 
     # ── Summary KPIs ───────────────────────────────────────────────────────
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3, c4, c5 = st.columns(5)
     c1.metric("Total Shown",  len(filtered_df))
     c2.metric("Critical",     len(filtered_df[filtered_df["risk_level"] == "Critical"]))
     c3.metric("High",         len(filtered_df[filtered_df["risk_level"] == "High"]))
     c4.metric("In Progress",  len(filtered_df[filtered_df["treatment_status"] == "In Progress"]))
+    c5.metric("✅ Resolved",   len(filtered_df[filtered_df["treatment_status"] == "Resolved"]))
     st.divider()
 
     if filtered_df.empty:
@@ -60,7 +61,7 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
     st.divider()
 
     # ── Colour-coded Table ─────────────────────────────────────────────────
-    def color_risk(val):
+    def color_risk_level(val):
         return {
             "Critical": "background-color:#FFCDD2;color:#B71C1C;font-weight:bold",
             "High":     "background-color:#FFE0B2;color:#E65100;font-weight:bold",
@@ -68,14 +69,39 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
             "Low":      "background-color:#C8E6C9;color:#1B5E20;font-weight:bold",
         }.get(val, "")
 
+    def color_treatment_status(val):
+        return {
+            "Resolved":    "background-color:#1B5E20;color:#ffffff;font-weight:bold;border-radius:4px",
+            "Mitigated":   "background-color:#1565C0;color:#ffffff;font-weight:bold;border-radius:4px",
+            "In Progress": "background-color:#E65100;color:#ffffff;font-weight:bold;border-radius:4px",
+            "Accepted":    "background-color:#546E7A;color:#ffffff;font-weight:bold;border-radius:4px",
+            "Transferred": "background-color:#6A1B9A;color:#ffffff;font-weight:bold;border-radius:4px",
+            "Avoided":     "background-color:#37474F;color:#ffffff;font-weight:bold;border-radius:4px",
+        }.get(val, "")
+
     display_cols = [
         "risk_id", "risk_description", "asset", "threat",
         "risk_level", "treatment_status", "iso_clause", "nist_function",
         "impact", "likelihood", "risk_score",
     ]
+
+    # ── Badge Legend ───────────────────────────────────────────────────────
+    st.markdown("""
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+      <span style="font-size:12px;font-weight:600;color:#64748b">Treatment Status:</span>
+      <span style="background:#1B5E20;color:#fff;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600">✅ Resolved</span>
+      <span style="background:#1565C0;color:#fff;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600">🛡️ Mitigated</span>
+      <span style="background:#E65100;color:#fff;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600">🔄 In Progress</span>
+      <span style="background:#546E7A;color:#fff;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600">✓ Accepted</span>
+      <span style="background:#6A1B9A;color:#fff;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600">↗ Transferred</span>
+      <span style="background:#37474F;color:#fff;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600">⊘ Avoided</span>
+    </div>
+    """, unsafe_allow_html=True)
+
     styled = (
         filtered_df[display_cols].style
-        .map(color_risk, subset=["risk_level"])
+        .map(color_risk_level, subset=["risk_level"])
+        .map(color_treatment_status, subset=["treatment_status"])
         .set_properties(**{"font-size": "13px"})
     )
     st.dataframe(styled, use_container_width=True, hide_index=True)
@@ -189,13 +215,14 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
                     )
                     treatment = st.selectbox(
                         "Treatment Status *",
-                        ["In Progress", "Mitigated", "Accepted", "Transferred", "Avoided"],
+                        ["In Progress", "Mitigated", "Accepted", "Transferred", "Avoided", "Resolved"],
                         help=(
                             "In Progress = controls being implemented  |  "
                             "Mitigated = controls applied and working  |  "
                             "Accepted = risk accepted by management  |  "
                             "Transferred = insured or outsourced  |  "
-                            "Avoided = activity/asset removed"
+                            "Avoided = activity/asset removed  |  "
+                            "Resolved = risk fully closed and verified"
                         ),
                     )
                     nist_func = st.selectbox(
