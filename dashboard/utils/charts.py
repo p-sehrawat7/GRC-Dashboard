@@ -423,7 +423,7 @@ def overdue_findings_bar(df: pd.DataFrame) -> go.Figure:
     if overdue.empty:
         fig = go.Figure()
         fig.add_annotation(
-            text="✅ No overdue findings!",
+            text="No overdue findings.",
             xref="paper", yref="paper",
             x=0.5, y=0.5, showarrow=False,
             font=dict(size=18, color="#388E3C"),

@@ -49,13 +49,13 @@ Each risk record stores:
 - **Likelihood score** — 1 (rare) to 5 (almost certain)
 - **Risk Score** — automatically calculated as Impact × Likelihood, giving a 1–25 scale
 - **Risk Level** — derived from the score: Low (1–6), Medium (7–12), High (13–18), Critical (19–25)
-- **Treatment Status** — what's being done about it: In Progress, Mitigated, Accepted, Transferred, or Avoided
+- **Treatment Status** — what's being done about it: In Progress, Mitigated, Accepted, Transferred, Avoided, or Resolved
 - **ISO 27001 Clause** — which part of the standard applies (e.g. A.9.4 for Access Control)
 - **NIST CSF Function** — which framework function the risk falls under
 
 The table is colour-coded by risk level so you can scan it at a glance. Filters in the sidebar let you slice by asset type, risk level, treatment status, ISO clause, and NIST function. There are CSV and Excel export buttons at the bottom.
 
-If you're logged in as Admin or Auditor, an "Add New Risk" expander appears with a fully validated form. It includes a live risk score preview that updates as you adjust the Impact and Likelihood sliders, colour-coded from green to red.
+If you're logged in as Admin or Auditor, clicking any row opens an **edit panel** below the table where you can update the Treatment Status (including marking a risk as Resolved) and Risk Level directly. An "Add New Risk" expander also appears with a fully validated form including a live risk score preview.
 
 ---
 
@@ -184,7 +184,7 @@ grc-dashboard/
 │   ├── auth.py              # Login page, bcrypt verification, RBAC guard
 │   ├── views/
 │   │   ├── dashboard.py     # Executive summary, KPIs, all charts
-│   │   ├── risk_register.py # Risk table, filters, add-risk form
+│   │   ├── risk_register.py # Risk table, filters, add-risk form, click-to-edit
 │   │   ├── control_matrix.py# Control table, filters, add-control form
 │   │   └── audit_findings.py# Findings table, overdue logic, exports
 │   └── utils/
@@ -213,7 +213,8 @@ grc-dashboard/
 │   └── ci.yml               # GitHub Actions: Black + Flake8 + pytest on push
 │
 ├── docs/
-│   └── architecture.md      # Component diagram and data flow description
+│   ├── architecture.md      # Component diagram and data flow description
+│   └── screenshots/         # App screenshots for README
 │
 ├── logs/                    # Application log output (gitignored)
 ├── Dockerfile               # Container build instructions
@@ -411,5 +412,57 @@ For persistent data across restarts, point the app at a hosted PostgreSQL instan
 - **SQLite is single-threaded** — Fine for a single-user local or Streamlit Cloud deployment. For multi-user production, switch to PostgreSQL via `DATABASE_URL`.
 - **No login rate limiting** — The login form has no lockout after repeated failures. A production deployment should add this.
 - **No user management UI** — Users are managed via the seed script or direct database access, not from within the dashboard.
+
+---
+
+## Screenshots
+
+### Login Page
+![Login Page](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/1.png)
+
+---
+
+### Executive Dashboard — Summary & KPIs
+![Executive Dashboard](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/2.png)
+
+---
+
+### Risk Register — Score Chart & Colour-coded Table
+![Risk Register Table](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/3.png)
+
+---
+
+### Risk Register — Click-to-Edit Panel
+![Edit Risk Panel](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/4.png)
+
+---
+
+### Dashboard — Governance & Compliance Coverage
+![Governance Coverage](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/5.png)
+
+---
+
+### Dashboard — Findings Analysis Charts
+![Findings Analysis](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/6.png)
+
+---
+
+### Audit Findings — Close a Finding
+![Close Finding](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/7.png)
+
+---
+
+### Control Matrix — Add New Control Form
+![Add Control Form](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/8.png)
+
+---
+
+### Audit Findings — Full Findings Table
+![Findings Table](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/9.png)
+
+---
+
+### Sidebar Filters
+![Sidebar Filters](https://raw.githubusercontent.com/p-sehrawat7/GRC-Dashboard/main/docs/screenshots/10.png)
 
 ---

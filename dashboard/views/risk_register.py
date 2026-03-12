@@ -3,6 +3,7 @@ views/risk_register.py
 ----------------------
 Risk Register page — filterable table, score chart, ISO/NIST breakdown,
 Add Risk form (Admin + Auditor), CSV and Excel export.
+Click any row to open an Edit panel to update treatment status and risk level.
 """
 
 import io
@@ -12,11 +13,16 @@ import plotly.express as px
 
 from utils.data_loader import RISK_COLORS, load_risk_data
 from utils.filters import risk_filters
-from utils.crud import add_risk
+from utils.crud import add_risk, update_risk
 from utils.logger import get_logger
 from database.db import get_db
 
 log = get_logger(__name__)
+
+TREATMENT_STATUSES = [
+    "In Progress", "Mitigated", "Accepted", "Transferred", "Avoided", "Resolved"
+]
+RISK_LEVELS = ["Low", "Medium", "High", "Critical"]
 
 
 def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
@@ -73,12 +79,148 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
         "risk_level", "treatment_status", "iso_clause", "nist_function",
         "impact", "likelihood", "risk_score",
     ]
+
+    # ── Click-to-Edit hint ─────────────────────────────────────────────────
+    if role in ("admin", "auditor"):
+        st.info("Click any row in the table below to open the edit panel for that risk.")
+
     styled = (
         filtered_df[display_cols].style
         .map(color_risk, subset=["risk_level"])
         .set_properties(**{"font-size": "13px"})
     )
-    st.dataframe(styled, use_container_width=True, hide_index=True)
+
+    # Row selection enabled for admin/auditor
+    if role in ("admin", "auditor"):
+        selection = st.dataframe(
+            styled,
+            use_container_width=True,
+            hide_index=True,
+            on_select="rerun",
+            selection_mode="single-row",
+            key="risk_table_selection",
+        )
+    else:
+        st.dataframe(styled, use_container_width=True, hide_index=True)
+        selection = None
+
+    # ── Edit Panel (appears when a row is clicked) ─────────────────────────
+    if role in ("admin", "auditor") and selection:
+        rows = selection.get("selection", {}).get("rows", [])
+        if rows:
+            selected_idx = rows[0]
+            selected_row = filtered_df.iloc[selected_idx]
+            risk_id_sel = selected_row["risk_id"]
+
+            st.divider()
+            st.markdown(
+                f"""
+                <div style="background:linear-gradient(135deg,#1E3A5F 0%,#2563EB 100%);
+                            padding:14px 20px;border-radius:10px;margin-bottom:16px;">
+                  <span style="color:#fff;font-size:18px;font-weight:700;">
+                    Editing Risk: {risk_id_sel}
+                  </span><br>
+                  <span style="color:#BAD5FF;font-size:13px;">
+                    {selected_row['risk_description'][:120]}{'...' if len(str(selected_row['risk_description'])) > 120 else ''}
+                  </span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            with st.form(f"edit_risk_form_{risk_id_sel}", clear_on_submit=False):
+                ec1, ec2 = st.columns(2)
+
+                with ec1:
+                    # Current status highlighted
+                    current_status = selected_row["treatment_status"]
+                    status_default = (
+                        TREATMENT_STATUSES.index(current_status)
+                        if current_status in TREATMENT_STATUSES else 0
+                    )
+                    new_status = st.selectbox(
+                        "Treatment Status",
+                        TREATMENT_STATUSES,
+                        index=status_default,
+                        help=(
+                            "In Progress = controls being implemented  |  "
+                            "Mitigated = controls applied and working  |  "
+                            "Accepted = risk accepted by management  |  "
+                            "Transferred = insured or outsourced  |  "
+                            "Avoided = activity/asset removed  |  "
+                            "Resolved = risk fully closed and verified"
+                        ),
+                    )
+
+                with ec2:
+                    current_level = selected_row["risk_level"]
+                    level_default = (
+                        RISK_LEVELS.index(current_level)
+                        if current_level in RISK_LEVELS else 2
+                    )
+                    new_level = st.selectbox(
+                        "Risk Level",
+                        RISK_LEVELS,
+                        index=level_default,
+                        help="Update if the residual risk level has changed after treatment.",
+                    )
+
+                # Show a visual status badge preview
+                badge_colors = {
+                    "Resolved":    ("#1B5E20", "#fff", "[R]"),
+                    "Mitigated":   ("#1565C0", "#fff", "[M]"),
+                    "In Progress": ("#E65100", "#fff", "[P]"),
+                    "Accepted":    ("#546E7A", "#fff", "[A]"),
+                    "Transferred": ("#6A1B9A", "#fff", "[T]"),
+                    "Avoided":     ("#37474F", "#fff", "[X]"),
+                }
+                bg, fg, icon = badge_colors.get(new_status, ("#546E7A", "#fff", ""))
+                st.markdown(
+                    f"<div style='margin:8px 0 4px 0'>"
+                    f"<span style='background:{bg};color:{fg};padding:4px 16px;"
+                    f"border-radius:6px;font-size:13px;font-weight:700'>"
+                    f"{icon} {new_status}</span></div>",
+                    unsafe_allow_html=True,
+                )
+
+                save_col, cancel_col = st.columns([1, 3])
+                with save_col:
+                    submitted = st.form_submit_button(
+                        "Save Changes", use_container_width=True, type="primary"
+                    )
+
+                if submitted:
+                    changes = {}
+                    if new_status != current_status:
+                        changes["treatment_status"] = new_status
+                    if new_level != current_level:
+                        changes["risk_level"] = new_level
+
+                    if not changes:
+                        st.info("No changes detected.")
+                    else:
+                        try:
+                            with get_db() as db:
+                                result = update_risk(db, risk_id_sel, changes, username)
+                            if result:
+                                load_risk_data.clear()
+                                log.info(
+                                    f"Risk {risk_id_sel} updated by {username}: {changes}"
+                                )
+                                parts = []
+                                if "treatment_status" in changes:
+                                    parts.append(f"Status → **{new_status}**")
+                                if "risk_level" in changes:
+                                    parts.append(f"Level → **{new_level}**")
+                                st.success(
+                                    f"Risk **{risk_id_sel}** updated: {' | '.join(parts)}"
+                                )
+                                st.rerun()
+                            else:
+                                st.error(f"Risk {risk_id_sel} not found in database.")
+                        except Exception as e:
+                            st.error(f"Failed to update risk: {e}")
+                            log.error(f"Risk update error for {risk_id_sel}: {e}")
 
     # ── ISO / NIST Breakdown ───────────────────────────────────────────────
     st.divider()
@@ -136,7 +278,7 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
 </tr>
 <tr style="border-bottom:1px solid #cbd5e1">
   <td style="padding:4px 8px 4px 0;font-weight:600">Treatment Status</td>
-  <td style="padding:4px 0">In Progress &nbsp;&bull;&nbsp; Mitigated &nbsp;&bull;&nbsp; Accepted &nbsp;&bull;&nbsp; Transferred &nbsp;&bull;&nbsp; Avoided</td>
+  <td style="padding:4px 0">In Progress &nbsp;&bull;&nbsp; Mitigated &nbsp;&bull;&nbsp; Accepted &nbsp;&bull;&nbsp; Transferred &nbsp;&bull;&nbsp; Avoided &nbsp;&bull;&nbsp; Resolved</td>
 </tr>
 <tr style="border-bottom:1px solid #cbd5e1">
   <td style="padding:4px 8px 4px 0;font-weight:600">NIST Function</td>
@@ -189,13 +331,14 @@ def render(risk_df: pd.DataFrame, username: str = "", role: str = "viewer"):
                     )
                     treatment = st.selectbox(
                         "Treatment Status *",
-                        ["In Progress", "Mitigated", "Accepted", "Transferred", "Avoided"],
+                        TREATMENT_STATUSES,
                         help=(
                             "In Progress = controls being implemented  |  "
                             "Mitigated = controls applied and working  |  "
                             "Accepted = risk accepted by management  |  "
                             "Transferred = insured or outsourced  |  "
-                            "Avoided = activity/asset removed"
+                            "Avoided = activity/asset removed  |  "
+                            "Resolved = risk fully closed and verified"
                         ),
                     )
                     nist_func = st.selectbox(
