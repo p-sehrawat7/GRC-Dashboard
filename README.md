@@ -413,3 +413,55 @@ For persistent data across restarts, point the app at a hosted PostgreSQL instan
 - **No user management UI** — Users are managed via the seed script or direct database access, not from within the dashboard.
 
 ---
+
+## Screenshots
+
+### Login Page
+![Login Page](docs/screenshots/1.png)
+
+---
+
+### Executive Dashboard — Summary & KPIs
+![Executive Dashboard](docs/screenshots/2.png)
+
+---
+
+### Risk Register — Score Chart & Colour-coded Table
+![Risk Register Table](docs/screenshots/3.png)
+
+---
+
+### Risk Register — Click-to-Edit Panel
+![Edit Risk Panel](docs/screenshots/4.png)
+
+---
+
+### Dashboard — Governance & Compliance Coverage
+![Governance Coverage](docs/screenshots/5.png)
+
+---
+
+### Dashboard — Findings Analysis Charts
+![Findings Analysis](docs/screenshots/6.png)
+
+---
+
+### Audit Findings — Close a Finding
+![Close Finding](docs/screenshots/7.png)
+
+---
+
+### Control Matrix — Add New Control Form
+![Add Control Form](docs/screenshots/8.png)
+
+---
+
+### Audit Findings — Full Findings Table
+![Findings Table](docs/screenshots/9.png)
+
+---
+
+### Sidebar Filters
+![Sidebar Filters](docs/screenshots/10.png)
+
+---
