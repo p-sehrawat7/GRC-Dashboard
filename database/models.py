@@ -32,7 +32,7 @@ class Risk(Base):
         nullable=False,
     )
     treatment_status  = Column(
-        Enum("In Progress", "Mitigated", "Accepted", "Transferred", "Avoided",
+        Enum("In Progress", "Mitigated", "Accepted", "Transferred", "Avoided", "Resolved",
              name="treatment_status_enum"),
         nullable=False,
     )
